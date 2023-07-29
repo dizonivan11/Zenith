@@ -9,6 +9,7 @@ public class MainGame : Game {
     SpriteBatch spriteBatch;
     TileMap tileMap;
     Player player;
+    Vector2 CameraPosition;
 
     public MainGame() {
         graphics = new GraphicsDeviceManager(this);
@@ -34,7 +35,7 @@ public class MainGame : Game {
         GraphicsDevice.Clear(Color.CornflowerBlue);
 
         spriteBatch.Begin();
-        tileMap.Draw(spriteBatch);
+        tileMap.Draw(spriteBatch, CameraPosition, GraphicsDevice.Viewport);
         player.Draw(spriteBatch);
         spriteBatch.End();
 
