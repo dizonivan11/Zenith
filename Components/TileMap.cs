@@ -4,13 +4,15 @@ using System.IO;
 
 namespace Zenith.Components {
     public class TileMap {
-        private int[,] mapData;
+        private int[,] mapData = new int[0,0];
         private Texture2D tileset;
         private int tileWidth;
         private int tileHeight;
 
-        public TileMap(Texture2D tileset, string mapFile) {
+        public TileMap(Texture2D tileset, string mapFile, int tileWidth, int tileHeight) {
             this.tileset = tileset;
+            this.tileWidth = tileWidth;
+            this.tileHeight = tileHeight;
             LoadMapData(mapFile);
         }
 
@@ -30,8 +32,10 @@ namespace Zenith.Components {
             for (int y = startY; y < endY; y++) {
                 for (int x = startX; x < endX; x++) {
                     int tileID = mapData[x, y];
+                    int srcX = 0;
+                    int srcY = 0;
                     // Calculate the source rectangle based on the tileID and draw the tile.
-                    spriteBatch.Draw(tileset, new Vector2(x * tileWidth, y * tileHeight), sourceRectangle, Color.White);
+                    spriteBatch.Draw(tileset, new Vector2(x * tileWidth, y * tileHeight), new Rectangle(srcX, srcY, tileWidth, tileHeight), Color.White);
                 }
             }
         }
