@@ -5,14 +5,14 @@ using Zenith.Components;
 
 namespace Zenith.Components {
     public class Player {
-        private Texture2D spritesheet;
-        private Vector2 position;
-        private int frameWidth;
-        private int frameHeight;
-        private int currentFrame;
-        private int totalFrames;
-        private float frameTime;
-        private float timeElapsed;
+        Texture2D spritesheet;
+        Vector2 position;
+        int frameWidth;
+        int frameHeight;
+        int currentFrame;
+        int totalFrames;
+        float frameTime;
+        float timeElapsed;
 
         public Player(Texture2D spritesheet, Vector2 position, int frameWidth, int frameHeight, int totalFrames, float frameTime) {
             this.spritesheet = spritesheet;
