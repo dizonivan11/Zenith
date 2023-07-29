@@ -21,8 +21,8 @@ namespace Zenith.Components {
             this.frameHeight = frameHeight;
             this.totalFrames = totalFrames;
             this.frameTime = frameTime;
-            this.currentFrame = 0;
-            this.timeElapsed = 0f;
+            currentFrame = 0;
+            timeElapsed = 0f;
         }
 
         public void Update(GameTime gameTime, TileMap tileMap) {
