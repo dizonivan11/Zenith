@@ -19,7 +19,7 @@ namespace Zenith {
 
         protected override void LoadContent() {
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            tileMap = new TileMap(Importer.GetTexture2DFromFile(GraphicsDevice, "assets/tilesets/highlands.png"), "assets/maps/highlands_0_0.txt", 32, 32);
+            tileMap = new TileMap(Importer.GetTexture2DFromFile(GraphicsDevice, "assets/tilesets/highlands_terrain.png"), "assets/maps/highlands_0_0.txt", 32, 32);
             player = new Player(Importer.GetTexture2DFromFile(GraphicsDevice, "assets/sprites/female_wizard.png"), new Vector2(0, 0), 64, 64, 5, 0.25f);
         }
 
