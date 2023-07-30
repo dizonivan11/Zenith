@@ -27,6 +27,18 @@ namespace Zenith {
             if (Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
+            if (Keyboard.GetState().IsKeyDown(Keys.W))
+                CameraPosition += new Vector2(0, -10);
+
+            if (Keyboard.GetState().IsKeyDown(Keys.S))
+                CameraPosition += new Vector2(0, 10);
+
+            if (Keyboard.GetState().IsKeyDown(Keys.A))
+                CameraPosition += new Vector2(-10, 0);
+
+            if (Keyboard.GetState().IsKeyDown(Keys.D))
+                CameraPosition += new Vector2(10, 0);
+
             player.Update(gameTime, tileMap);
 
             base.Update(gameTime);
