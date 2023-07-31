@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Input;
 using Zenith.Components;
 using ImGuiNET;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Zenith.Scenes {
     public class EditorScene : Scene {
@@ -9,18 +10,22 @@ namespace Zenith.Scenes {
         readonly int TilesetWidth = 400;
 
         TileMap tileMap;
+        Texture2D selector;
         Vector2 cameraPosition;
         Vector2 cameraPositionDestination;
         readonly float panSpeed;
 
         public EditorScene(MainGame mainGame) : base(mainGame) {
             panSpeed = 20.0f;
+            cameraPosition = new Vector2(-ToolboxWidth, 0);
+            cameraPositionDestination = cameraPosition;
         }
 
         public override void LoadContent() {
             tileMap = new TileMap(
                 Importer.GetTexture2DFromFile(mainGame.GraphicsDevice, "assets/tilesets/highlands_terrain.png"),
                 "assets/maps/highlands_0_0.txt", 32, 32);
+            selector = Importer.GetTexture2DFromFile(mainGame.GraphicsDevice, "assets/gfx/selector.png");
         }
 
         public override void Update(GameTime gameTime) {
@@ -42,19 +47,20 @@ namespace Zenith.Scenes {
 
         public override void Draw() {
             tileMap.Draw(mainGame.spriteBatch, cameraPosition, mainGame.GraphicsDevice.Viewport);
+            tileMap.DrawEditor(mainGame.spriteBatch, cameraPosition, mainGame.GraphicsDevice.Viewport, selector, Mouse.GetState());
             mainGame.DrawFPSCounter(ToolboxWidth + 10, 1);
         }
 
         /// <summary>
         /// ImGui Notes:
-        /// Declaring a bool is like creating windows, setting it to true makes it visible
+        /// Declaring a bool is like toggling windows, setting it to true makes it visible
         /// It can also be set as false initially then control it on other widgets/functions
         /// </summary>
         bool windowTools = true;
         bool windowTileset = true;
         public override void DrawUI(GameTime gameTime) {
             if (windowTools) {
-                ImGui.SetNextWindowPos(new System.Numerics.Vector2(0, 0), ImGuiCond.FirstUseEver);
+                ImGui.SetNextWindowPos(new System.Numerics.Vector2(0, 0), ImGuiCond.None);
                 ImGui.SetNextWindowSize(new System.Numerics.Vector2(ToolboxWidth, mainGame.GraphicsDevice.Viewport.Height));
                 ImGui.Begin("Tools",
                     ref windowTools,
@@ -69,7 +75,7 @@ namespace Zenith.Scenes {
                 ImGui.End();
             }
             if (windowTileset) {
-                ImGui.SetNextWindowPos(new System.Numerics.Vector2(mainGame.GraphicsDevice.Viewport.Width - TilesetWidth, 0), ImGuiCond.FirstUseEver);
+                ImGui.SetNextWindowPos(new System.Numerics.Vector2(mainGame.GraphicsDevice.Viewport.Width - TilesetWidth, 0), ImGuiCond.None);
                 ImGui.SetNextWindowSize(new System.Numerics.Vector2(TilesetWidth, mainGame.GraphicsDevice.Viewport.Height));
                 ImGui.Begin("Tileset",
                     ref windowTileset,
