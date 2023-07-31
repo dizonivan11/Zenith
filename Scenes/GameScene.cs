@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Zenith.Components;
 
@@ -51,7 +50,7 @@ namespace Zenith.Scenes {
             CameraPosition = Vector2.Lerp(CameraPosition, CameraPositionDestination, 0.1f);
             player.Update(gameTime);
 
-            if (Keyboard.GetState().IsKeyDown(Keys.F1)) {
+            if (Keyboard.GetState().IsKeyDown(Keys.F2)) {
                 mainGame.ChangeScene(new EditorScene(mainGame));
             }
         }
@@ -59,6 +58,7 @@ namespace Zenith.Scenes {
         public override void Draw() {
             tileMap.Draw(mainGame.spriteBatch, CameraPosition, mainGame.GraphicsDevice.Viewport);
             player.Draw(mainGame.spriteBatch, CameraPosition);
+            mainGame.DrawFPSCounter(1, 1);
         }
     }
 }

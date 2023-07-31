@@ -8,11 +8,11 @@ namespace Zenith.Components {
         public static readonly int CHUNK_SIZE = 64;
         public static readonly int CULL_OFFSET = 2;
 
-        int[,] mapData = new int[CHUNK_SIZE, CHUNK_SIZE];
-        Texture2D tileset;
-        int maxTilesetX;
-        int tileWidth;
-        int tileHeight;
+        public readonly int[,] mapData = new int[CHUNK_SIZE, CHUNK_SIZE];
+        public readonly Texture2D tileset;
+        public readonly int maxTilesetX;
+        public readonly int tileWidth;
+        public readonly int tileHeight;
 
         public TileMap(Texture2D tileset, string mapFile, int tileWidth, int tileHeight) {
             this.tileset = tileset;
