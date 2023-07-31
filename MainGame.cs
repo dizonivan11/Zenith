@@ -20,9 +20,9 @@ namespace Zenith {
                 PreferMultiSampling = true,
                 GraphicsProfile = GraphicsProfile.HiDef,
                 HardwareModeSwitch = false, // true = Fullscreen; false = Borderless Fullscreen
-                IsFullScreen = true
+                IsFullScreen = true,
+                SynchronizeWithVerticalRetrace = false
             };
-            graphics.SynchronizeWithVerticalRetrace = false;
             TargetElapsedTime = TimeSpan.FromMilliseconds(1000d / 165);
             IsMouseVisible = true;
             fps = new FPSCounter();
@@ -46,7 +46,7 @@ namespace Zenith {
         protected override void Update(GameTime gameTime) {
             scene.Update(gameTime);
             fps.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
-
+            
             if (Keyboard.GetState().IsKeyDown(Keys.F11)) {
                 graphics.IsFullScreen = !graphics.IsFullScreen;
                 graphics.ApplyChanges();
