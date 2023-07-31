@@ -11,5 +11,6 @@ namespace Zenith.Scenes {
         public abstract void LoadContent();
         public abstract void Update(GameTime gameTime);
         public abstract void Draw();
+        public abstract void DrawUI(GameTime gameTime);
     }
 }

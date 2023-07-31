@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Myra;
-using Myra.Graphics2D.UI;
+using Microsoft.Xna.Framework.Input;
+using MonoGame.ImGui;
 using System;
 using Zenith.Components;
 using Zenith.Scenes;
@@ -11,7 +11,7 @@ namespace Zenith {
         public readonly GraphicsDeviceManager graphics;
         public SpriteBatch spriteBatch;
         public SpriteFont regularFont;
-        public Desktop desktop;
+        public ImGuiRenderer ui;
         public readonly FPSCounter fps;
         Scene scene;
 
@@ -26,28 +26,33 @@ namespace Zenith {
             graphics.SynchronizeWithVerticalRetrace = false;
             TargetElapsedTime = TimeSpan.FromMilliseconds(1000d / 165);
             IsMouseVisible = true;
-            MyraEnvironment.Game = this;
-            MyraEnvironment.SmoothText = true;
             fps = new FPSCounter();
             scene = new GameScene(this);
             Content.RootDirectory = "Content";
         }
 
         public void ChangeScene(Scene newScene) {
-            desktop = new Desktop();
+            ui = new ImGuiRenderer(this).Initialize().RebuildFontAtlas();
             newScene.LoadContent();
             scene = newScene;
         }
 
         protected override void LoadContent() {
-            regularFont = Content.Load<SpriteFont>("default");
             spriteBatch = new SpriteBatch(GraphicsDevice);
+            regularFont = Content.Load<SpriteFont>("default");
+            ui = new ImGuiRenderer(this).Initialize().RebuildFontAtlas();
             scene.LoadContent();
         }
 
         protected override void Update(GameTime gameTime) {
             scene.Update(gameTime);
             fps.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
+
+            if (Keyboard.GetState().IsKeyDown(Keys.F11)) {
+                graphics.IsFullScreen = !graphics.IsFullScreen;
+                graphics.ApplyChanges();
+            }
+
             base.Update(gameTime);
         }
 
@@ -56,7 +61,9 @@ namespace Zenith {
             spriteBatch.Begin();
             scene.Draw();
             spriteBatch.End();
-            desktop?.Render();
+            ui.BeginLayout(gameTime);
+            scene.DrawUI(gameTime);
+            ui.EndLayout();
             base.Draw(gameTime);
         }
 

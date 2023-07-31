@@ -60,5 +60,9 @@ namespace Zenith.Scenes {
             player.Draw(mainGame.spriteBatch, CameraPosition);
             mainGame.DrawFPSCounter(1, 1);
         }
+
+        public override void DrawUI(GameTime gameTime) {
+            
+        }
     }
 }
