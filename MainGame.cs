@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using ImGuiNET;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.ImGui;
@@ -12,6 +13,7 @@ namespace Zenith {
         public SpriteBatch spriteBatch;
         public SpriteFont regularFont;
         public ImGuiRenderer ui;
+        public ImGuiIOPtr io;
         public readonly FPSCounter fps;
         Scene scene;
 
@@ -32,6 +34,7 @@ namespace Zenith {
 
         public void ChangeScene(Scene newScene) {
             ui = new ImGuiRenderer(this).Initialize().RebuildFontAtlas();
+            io = ImGui.GetIO();
             newScene.LoadContent();
             scene = newScene;
         }
