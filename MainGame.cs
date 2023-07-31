@@ -1,57 +1,57 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using System.IO;
+using System;
 using Zenith.Components;
+using Zenith.Scenes;
 
 namespace Zenith {
     public class MainGame : Game {
-        GraphicsDeviceManager graphics;
-        SpriteBatch spriteBatch;
-        TileMap tileMap;
-        Player player;
-        Vector2 CameraPosition;
+        public readonly GraphicsDeviceManager graphics;
+        public SpriteBatch spriteBatch;
+        public SpriteFont regularFont;
+        public readonly FPSCounter fps;
+        Scene scene;
 
         public MainGame() {
-            graphics = new GraphicsDeviceManager(this);
+            graphics = new GraphicsDeviceManager(this) {
+                PreferMultiSampling = true,
+                GraphicsProfile = GraphicsProfile.HiDef,
+                HardwareModeSwitch = false, // true = Fullscreen; false = Borderless Fullscreen
+                IsFullScreen = true
+            };
+            graphics.PreferMultiSampling = true;
+            graphics.SynchronizeWithVerticalRetrace = false;
+            TargetElapsedTime = TimeSpan.FromMilliseconds(1000d / 165);
+            IsMouseVisible = true;
+            fps = new FPSCounter();
+            scene = new GameScene(this);
             Content.RootDirectory = "Content";
         }
 
+        public void ChangeScene(Scene newScene) {
+            newScene.LoadContent();
+            scene = newScene;
+        }
+
         protected override void LoadContent() {
+            regularFont = Content.Load<SpriteFont>("default");
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            tileMap = new TileMap(Importer.GetTexture2DFromFile(GraphicsDevice, "assets/tilesets/highlands_terrain.png"), "assets/maps/highlands_0_0.txt", 32, 32);
-            player = new Player(Importer.GetTexture2DFromFile(GraphicsDevice, "assets/sprites/female_wizard.png"), new Vector2(0, 0), 64, 64, 5, 0.25f);
+            scene.LoadContent();
         }
 
         protected override void Update(GameTime gameTime) {
-            if (Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();
-
-            if (Keyboard.GetState().IsKeyDown(Keys.W))
-                CameraPosition += new Vector2(0, -10);
-
-            if (Keyboard.GetState().IsKeyDown(Keys.S))
-                CameraPosition += new Vector2(0, 10);
-
-            if (Keyboard.GetState().IsKeyDown(Keys.A))
-                CameraPosition += new Vector2(-10, 0);
-
-            if (Keyboard.GetState().IsKeyDown(Keys.D))
-                CameraPosition += new Vector2(10, 0);
-
-            player.Update(gameTime, tileMap);
-
+            scene.Update(gameTime);
+            fps.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
             base.Update(gameTime);
         }
 
         protected override void Draw(GameTime gameTime) {
             GraphicsDevice.Clear(Color.CornflowerBlue);
-
             spriteBatch.Begin();
-            tileMap.Draw(spriteBatch, CameraPosition, GraphicsDevice.Viewport);
-            player.Draw(spriteBatch);
+            scene.Draw();
+            var fpsString = string.Format("FPS: {0}", (int)fps.AverageFramesPerSecond);
+            spriteBatch.DrawString(regularFont, fpsString, new Vector2(1, 1), Color.Black);
             spriteBatch.End();
-
             base.Draw(gameTime);
         }
     }

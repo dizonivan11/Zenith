@@ -6,28 +6,30 @@ using Zenith.Components;
 namespace Zenith.Components {
     public class Player {
         Texture2D spritesheet;
-        Vector2 position;
-        int frameWidth;
-        int frameHeight;
+        public Vector2 position;
+        public float speed;
+        public int frameWidth;
+        public int frameHeight;
+        public int currentFrameIndex;
         int currentFrame;
         int totalFrames;
         float frameTime;
         float timeElapsed;
 
-        public Player(Texture2D spritesheet, Vector2 position, int frameWidth, int frameHeight, int totalFrames, float frameTime) {
+        public Player(Texture2D spritesheet, Vector2 position, float speed, int frameWidth, int frameHeight, int initialFrameIndex, int totalFrames, float frameTime) {
             this.spritesheet = spritesheet;
             this.position = position;
+            this.speed = speed;
             this.frameWidth = frameWidth;
             this.frameHeight = frameHeight;
+            currentFrameIndex = initialFrameIndex;
             this.totalFrames = totalFrames;
             this.frameTime = frameTime;
             currentFrame = 0;
             timeElapsed = 0f;
         }
 
-        public void Update(GameTime gameTime, TileMap tileMap) {
-            // Handle player movement based on keyboard input and collision with tiles in the tilemap.
-
+        public void Update(GameTime gameTime) {
             // Update the animation frame.
             timeElapsed += (float)gameTime.ElapsedGameTime.TotalSeconds;
             if (timeElapsed > frameTime) {
@@ -36,11 +38,13 @@ namespace Zenith.Components {
             }
         }
 
-        public void Draw(SpriteBatch spriteBatch) {
+        public void Draw(SpriteBatch spriteBatch, Vector2 cameraPosition) {
             // Calculate the source rectangle based on the current animation frame.
-            Rectangle sourceRect = new Rectangle(currentFrame * frameWidth, 0, frameWidth, frameHeight);
+            Rectangle sourceRect = new Rectangle(currentFrame * frameWidth, currentFrameIndex * frameHeight, frameWidth, frameHeight);
 
-            spriteBatch.Draw(spritesheet, position, sourceRect, Color.White);
+            spriteBatch.Draw(spritesheet,
+                position - cameraPosition,
+                sourceRect, Color.White);
         }
     }
 }
