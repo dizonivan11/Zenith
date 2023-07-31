@@ -22,7 +22,6 @@ namespace Zenith {
                 HardwareModeSwitch = false, // true = Fullscreen; false = Borderless Fullscreen
                 IsFullScreen = true
             };
-            graphics.PreferMultiSampling = true;
             graphics.SynchronizeWithVerticalRetrace = false;
             TargetElapsedTime = TimeSpan.FromMilliseconds(1000d / 165);
             IsMouseVisible = true;
@@ -58,7 +57,11 @@ namespace Zenith {
 
         protected override void Draw(GameTime gameTime) {
             GraphicsDevice.Clear(Color.Black);
-            spriteBatch.Begin();
+            spriteBatch.Begin(SpriteSortMode.Deferred,
+                BlendState.NonPremultiplied,
+                SamplerState.PointWrap,
+                DepthStencilState.DepthRead,
+                RasterizerState.CullCounterClockwise);
             scene.Draw();
             spriteBatch.End();
             ui.BeginLayout(gameTime);
