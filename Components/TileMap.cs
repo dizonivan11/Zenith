@@ -1,5 +1,7 @@
-﻿using Microsoft.Xna.Framework;
+﻿using ImGuiNET;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using System;
 using System.IO;
 
@@ -55,6 +57,32 @@ namespace Zenith.Components {
                         new Vector2((x * tileWidth) - cameraPosition.X, (y * tileHeight) - cameraPosition.Y),
                         new Rectangle(srcX, srcY, tileWidth, tileHeight),
                         Color.White);
+                }
+            }
+        }
+
+        public void DrawEditor(SpriteBatch spriteBatch, Vector2 cameraPosition, Viewport viewport, Texture2D selector, MouseState mouse) {
+            // Calculate the range of tiles visible on the screen based on the camera position and the viewport.
+            int startX = MathHelper.Clamp((int)(cameraPosition.X / tileWidth) - CULL_OFFSET, 0, CHUNK_SIZE);
+            int startY = MathHelper.Clamp((int)(cameraPosition.Y / tileHeight) - CULL_OFFSET, 0, CHUNK_SIZE);
+            int endX = MathHelper.Clamp(startX + viewport.Width / tileWidth + 1 + (CULL_OFFSET * 2), 0, CHUNK_SIZE);
+            int endY = MathHelper.Clamp(startY + viewport.Height / tileHeight + 1 + (CULL_OFFSET * 2), 0, CHUNK_SIZE);
+
+            for (int y = startY; y < endY; y++) {
+                for (int x = startX; x < endX; x++) {
+                    float destX = (x * tileWidth) - cameraPosition.X;
+                    float destY = (y * tileHeight) - cameraPosition.Y;
+
+                    if (!ImGui.IsAnyItemHovered() && new Rectangle((int)destX, (int)destY, tileWidth, tileHeight).Contains(mouse.Position)) {
+                        spriteBatch.Draw(
+                            selector,
+                            new Vector2(destX, destY),
+                            Color.White);
+
+                        if (mouse.LeftButton == ButtonState.Pressed) {
+                            mapData[x, y] = 182;
+                        }
+                    }
                 }
             }
         }
