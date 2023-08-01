@@ -6,8 +6,8 @@ namespace Zenith.Scenes {
     public class GameScene : Scene {
         TileMap tileMap;
         Player player;
-        Vector2 CameraPosition;
-        Vector2 CameraPositionDestination;
+        Vector2 cameraPosition;
+        Vector2 cameraPositionDestination;
 
         public GameScene(MainGame mainGame) : base(mainGame) {
 
@@ -25,19 +25,19 @@ namespace Zenith.Scenes {
 
         public override void Update(GameTime gameTime) {
             Vector2 dir = Vector2.Zero;
-            if (Keyboard.GetState().IsKeyDown(Keys.W)) {
+            if (mainGame.gameInput.KeyDown(Keys.W)) {
                 dir.Y = -1;
                 player.currentFrameIndex = 8;
             }
-            if (Keyboard.GetState().IsKeyDown(Keys.S)) {
+            if (mainGame.gameInput.KeyDown(Keys.S)) {
                 dir.Y = 1;
                 player.currentFrameIndex = 10;
             }
-            if (Keyboard.GetState().IsKeyDown(Keys.A)) {
+            if (mainGame.gameInput.KeyDown(Keys.A)) {
                 dir.X = -1;
                 player.currentFrameIndex = 9;
             }
-            if (Keyboard.GetState().IsKeyDown(Keys.D)) {
+            if (mainGame.gameInput.KeyDown(Keys.D)) {
                 dir.X = 1;
                 player.currentFrameIndex = 11;
             }
@@ -45,19 +45,22 @@ namespace Zenith.Scenes {
                 dir.Normalize();
                 player.position += dir * player.speed * (float)gameTime.ElapsedGameTime.TotalMilliseconds;
             }
-            CameraPositionDestination.X = player.position.X + (player.frameWidth / 2) - (mainGame.GraphicsDevice.Viewport.Width / 2);
-            CameraPositionDestination.Y = player.position.Y + (player.frameHeight / 2) - (mainGame.GraphicsDevice.Viewport.Height / 2);
-            CameraPosition = Vector2.Lerp(CameraPosition, CameraPositionDestination, 0.1f);
+            cameraPositionDestination.X = player.position.X + (player.frameWidth / 2) - (mainGame.GraphicsDevice.Viewport.Width / 2);
+            cameraPositionDestination.Y = player.position.Y + (player.frameHeight / 2) - (mainGame.GraphicsDevice.Viewport.Height / 2);
+            cameraPosition = Vector2.Lerp(cameraPosition, cameraPositionDestination, 0.1f);
+
+            // Snap the camera if its almost at the destination to prevent pixel jittering causing blur
+            if (Vector2.Distance(cameraPosition, cameraPositionDestination) <= 1f) cameraPosition = cameraPositionDestination;
+
             player.Update(gameTime);
 
-            if (Keyboard.GetState().IsKeyDown(Keys.F2)) {
+            if (mainGame.gameInput.KeyPressed(Keys.F2))
                 mainGame.ChangeScene(new EditorScene(mainGame));
-            }
         }
 
         public override void Draw() {
-            tileMap.Draw(mainGame.spriteBatch, CameraPosition, mainGame.GraphicsDevice.Viewport);
-            player.Draw(mainGame.spriteBatch, CameraPosition);
+            tileMap.Draw(mainGame.spriteBatch, cameraPosition, mainGame.GraphicsDevice.Viewport);
+            player.Draw(mainGame.spriteBatch, cameraPosition);
             mainGame.DrawFPSCounter(1, 1);
         }
 

@@ -60,7 +60,7 @@ namespace Zenith.Components {
             }
         }
 
-        public void DrawEditor(SpriteBatch spriteBatch, Vector2 cameraPosition, Viewport viewport, Texture2D selector, ImGuiIOPtr io) {
+        public void DrawEditor(SpriteBatch spriteBatch, Vector2 cameraPosition, Viewport viewport, Texture2D selector, ImGuiIOPtr guiInput, InputManager gameInput) {
             // Calculate the range of tiles visible on the screen based on the camera position and the viewport.
             int startX = MathHelper.Clamp((int)(cameraPosition.X / tileWidth) - CULL_OFFSET, 0, CHUNK_SIZE);
             int startY = MathHelper.Clamp((int)(cameraPosition.Y / tileHeight) - CULL_OFFSET, 0, CHUNK_SIZE);
@@ -72,13 +72,13 @@ namespace Zenith.Components {
                     float destX = (x * tileWidth) - cameraPosition.X;
                     float destY = (y * tileHeight) - cameraPosition.Y;
 
-                    if (!io.WantCaptureMouse && new Rectangle((int)destX, (int)destY, tileWidth, tileHeight).Contains(io.MousePos)) {
+                    if (!guiInput.WantCaptureMouse && new Rectangle((int)destX, (int)destY, tileWidth, tileHeight).Contains(gameInput.MousePosition)) {
                         spriteBatch.Draw(
                             selector,
                             new Vector2(destX, destY),
                             Color.White);
 
-                        if (ImGui.IsMouseDown(ImGuiMouseButton.Left)) {
+                        if (gameInput.MouseDown(MouseButton.Left)) {
                             mapData[x, y] = 182;
                         }
                     }

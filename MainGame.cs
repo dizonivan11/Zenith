@@ -13,7 +13,8 @@ namespace Zenith {
         public SpriteBatch spriteBatch;
         public SpriteFont regularFont;
         public ImGuiRenderer ui;
-        public ImGuiIOPtr io;
+        public ImGuiIOPtr guiInput;
+        public readonly InputManager gameInput;
         public readonly FPSCounter fps;
         Scene scene;
 
@@ -27,14 +28,14 @@ namespace Zenith {
             };
             TargetElapsedTime = TimeSpan.FromMilliseconds(1000d / 165);
             IsMouseVisible = true;
+            gameInput = new InputManager(this);
             fps = new FPSCounter();
             scene = new GameScene(this);
             Content.RootDirectory = "Content";
         }
 
         public void ChangeScene(Scene newScene) {
-            ui = new ImGuiRenderer(this).Initialize().RebuildFontAtlas();
-            io = ImGui.GetIO();
+            LoadContent();
             newScene.LoadContent();
             scene = newScene;
         }
@@ -43,18 +44,21 @@ namespace Zenith {
             spriteBatch = new SpriteBatch(GraphicsDevice);
             regularFont = Content.Load<SpriteFont>("default");
             ui = new ImGuiRenderer(this).Initialize().RebuildFontAtlas();
+            guiInput = ImGui.GetIO();
             scene.LoadContent();
         }
 
         protected override void Update(GameTime gameTime) {
+            gameInput.BeginCapture(Mouse.GetState(), Keyboard.GetState());
             scene.Update(gameTime);
-            fps.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
             
-            if (Keyboard.GetState().IsKeyDown(Keys.F11)) {
+            if (gameInput.KeyPressed(Keys.F11)) {
                 graphics.IsFullScreen = !graphics.IsFullScreen;
                 graphics.ApplyChanges();
             }
 
+            fps.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
+            gameInput.EndCapture();
             base.Update(gameTime);
         }
 

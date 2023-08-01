@@ -30,24 +30,29 @@ namespace Zenith.Scenes {
 
         public override void Update(GameTime gameTime) {
             Vector2 dir = Vector2.Zero;
-            if (Keyboard.GetState().IsKeyDown(Keys.W)) dir.Y = -1;
-            if (Keyboard.GetState().IsKeyDown(Keys.S)) dir.Y = 1;
-            if (Keyboard.GetState().IsKeyDown(Keys.A)) dir.X = -1;
-            if (Keyboard.GetState().IsKeyDown(Keys.D)) dir.X = 1;
+            if (mainGame.gameInput.KeyDown(Keys.W)) dir.Y = -1;
+            if (mainGame.gameInput.KeyDown(Keys.S)) dir.Y = 1;
+            if (mainGame.gameInput.KeyDown(Keys.A)) dir.X = -1;
+            if (mainGame.gameInput.KeyDown(Keys.D)) dir.X = 1;
             if (dir != Vector2.Zero) {
                 dir.Normalize();
                 cameraPositionDestination = cameraPosition + dir * panSpeed * (float)gameTime.ElapsedGameTime.TotalMilliseconds;
             }
             cameraPosition = Vector2.Lerp(cameraPosition, cameraPositionDestination, 0.1f);
+            
+            // Snap the camera if its almost at the destination to prevent pixel jittering causing blur
+            if (Vector2.Distance(cameraPosition, cameraPositionDestination) <= 1f) cameraPosition = cameraPositionDestination;
 
-            if (Keyboard.GetState().IsKeyDown(Keys.F1)) {
+            if (mainGame.gameInput.KeyPressed(Keys.F1))
                 mainGame.ChangeScene(new GameScene(mainGame));
-            }
+
+            if (mainGame.gameInput.KeyPressed(Keys.F2))
+                windowDemo = !windowDemo;
         }
 
         public override void Draw() {
             tileMap.Draw(mainGame.spriteBatch, cameraPosition, mainGame.GraphicsDevice.Viewport);
-            tileMap.DrawEditor(mainGame.spriteBatch, cameraPosition, mainGame.GraphicsDevice.Viewport, selector, Mouse.GetState());
+            tileMap.DrawEditor(mainGame.spriteBatch, cameraPosition, mainGame.GraphicsDevice.Viewport, selector, mainGame.guiInput, mainGame.gameInput);
             mainGame.DrawFPSCounter(ToolboxWidth + 10, 1);
         }
 
@@ -56,9 +61,13 @@ namespace Zenith.Scenes {
         /// Declaring a bool is like toggling windows, setting it to true makes it visible
         /// It can also be set as false initially then control it on other widgets/functions
         /// </summary>
+        bool windowDemo = false;
         bool windowTools = true;
         bool windowTileset = true;
         public override void DrawUI(GameTime gameTime) {
+            if (windowDemo)
+                ImGui.ShowDemoWindow(ref windowDemo);
+
             if (windowTools) {
                 ImGui.SetNextWindowPos(new System.Numerics.Vector2(0, 0), ImGuiCond.None);
                 ImGui.SetNextWindowSize(new System.Numerics.Vector2(ToolboxWidth, mainGame.GraphicsDevice.Viewport.Height));
