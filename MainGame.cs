@@ -26,7 +26,13 @@ namespace Zenith {
                 IsFullScreen = true,
                 SynchronizeWithVerticalRetrace = false
             };
-            TargetElapsedTime = TimeSpan.FromMilliseconds(1000d / 165);
+
+            // 165 FPS capped
+            // TargetElapsedTime = TimeSpan.FromMilliseconds(1000d / 165);
+
+            //  Unlimited FPS
+            IsFixedTimeStep = false;
+
             IsMouseVisible = true;
             gameInput = new InputManager(this);
             fps = new FPSCounter();
