@@ -14,7 +14,6 @@ namespace Zenith.Scenes {
 
         TileMap tileMap;
         Texture2D[] tiles;
-        int selectedTile;
         Texture2D selector;
         Vector2 cameraPosition;
         Vector2 cameraPositionDestination;
@@ -170,7 +169,7 @@ namespace Zenith.Scenes {
                         if (ImGui.ImageButton(string.Format("{0}-{1}", x, y),
                             mainGame.ui.BindTexture(tiles[t]),
                             new NVector2(tileMap.tileWidth, tileMap.tileHeight))) {
-                            selectedTile = t;
+                            Editor.SelectedTile = t;
                         }
                         if ((t + 1) % tileMap.maxTilesetX != 0) ImGui.SameLine();
                     }
