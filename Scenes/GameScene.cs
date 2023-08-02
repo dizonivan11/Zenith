@@ -47,10 +47,10 @@ namespace Zenith.Scenes {
             }
             cameraPositionDestination.X = player.position.X + (player.frameWidth / 2) - (mainGame.GraphicsDevice.Viewport.Width / 2);
             cameraPositionDestination.Y = player.position.Y + (player.frameHeight / 2) - (mainGame.GraphicsDevice.Viewport.Height / 2);
-            cameraPosition = Vector2.Lerp(cameraPosition, cameraPositionDestination, 0.1f);
+            cameraPosition = Vector2.Lerp(cameraPosition, cameraPositionDestination, 0.008f * (float)gameTime.ElapsedGameTime.TotalMilliseconds);
 
             // Snap the camera if its almost at the destination to prevent pixel jittering causing blur
-            if (Vector2.Distance(cameraPosition, cameraPositionDestination) <= 1f) cameraPosition = cameraPositionDestination;
+            if (Vector2.Distance(cameraPosition, cameraPositionDestination) <= 1f) cameraPositionDestination = cameraPosition;
 
             player.Update(gameTime);
 

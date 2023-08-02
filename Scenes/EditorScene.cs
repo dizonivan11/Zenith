@@ -6,8 +6,8 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Zenith.Scenes {
     public class EditorScene : Scene {
-        readonly int ToolboxWidth = 90;
-        readonly int TilesetWidth = 400;
+        const int TOOLBOX_WIDTH = 90;
+        const int TILESET_WIDTH = 400;
 
         TileMap tileMap;
         Texture2D selector;
@@ -16,8 +16,8 @@ namespace Zenith.Scenes {
         readonly float panSpeed;
 
         public EditorScene(MainGame mainGame) : base(mainGame) {
-            panSpeed = 20.0f;
-            cameraPosition = new Vector2(-ToolboxWidth, 0);
+            panSpeed = 100.0f;
+            cameraPosition = new Vector2(-TOOLBOX_WIDTH, 0);
             cameraPositionDestination = cameraPosition;
         }
 
@@ -38,10 +38,10 @@ namespace Zenith.Scenes {
                 dir.Normalize();
                 cameraPositionDestination = cameraPosition + dir * panSpeed * (float)gameTime.ElapsedGameTime.TotalMilliseconds;
             }
-            cameraPosition = Vector2.Lerp(cameraPosition, cameraPositionDestination, 0.1f);
+            cameraPosition = Vector2.Lerp(cameraPosition, cameraPositionDestination, 0.008f * (float)gameTime.ElapsedGameTime.TotalMilliseconds);
             
             // Snap the camera if its almost at the destination to prevent pixel jittering causing blur
-            if (Vector2.Distance(cameraPosition, cameraPositionDestination) <= 1f) cameraPosition = cameraPositionDestination;
+            if (Vector2.Distance(cameraPosition, cameraPositionDestination) <= 1f) cameraPositionDestination = cameraPosition;
 
             if (mainGame.gameInput.KeyPressed(Keys.F1))
                 mainGame.ChangeScene(new GameScene(mainGame));
@@ -53,7 +53,7 @@ namespace Zenith.Scenes {
         public override void Draw() {
             tileMap.Draw(mainGame.spriteBatch, cameraPosition, mainGame.GraphicsDevice.Viewport);
             tileMap.DrawEditor(mainGame.spriteBatch, cameraPosition, mainGame.GraphicsDevice.Viewport, selector, mainGame.guiInput, mainGame.gameInput);
-            mainGame.DrawFPSCounter(ToolboxWidth + 10, 1);
+            mainGame.DrawFPSCounter(TOOLBOX_WIDTH + 10, 1);
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace Zenith.Scenes {
 
             if (windowTools) {
                 ImGui.SetNextWindowPos(new System.Numerics.Vector2(0, 0), ImGuiCond.None);
-                ImGui.SetNextWindowSize(new System.Numerics.Vector2(ToolboxWidth, mainGame.GraphicsDevice.Viewport.Height));
+                ImGui.SetNextWindowSize(new System.Numerics.Vector2(TOOLBOX_WIDTH, mainGame.GraphicsDevice.Viewport.Height));
                 ImGui.Begin("Tools",
                     ref windowTools,
                     ImGuiWindowFlags.NoSavedSettings |
@@ -84,8 +84,8 @@ namespace Zenith.Scenes {
                 ImGui.End();
             }
             if (windowTileset) {
-                ImGui.SetNextWindowPos(new System.Numerics.Vector2(mainGame.GraphicsDevice.Viewport.Width - TilesetWidth, 0), ImGuiCond.None);
-                ImGui.SetNextWindowSize(new System.Numerics.Vector2(TilesetWidth, mainGame.GraphicsDevice.Viewport.Height));
+                ImGui.SetNextWindowPos(new System.Numerics.Vector2(mainGame.GraphicsDevice.Viewport.Width - TILESET_WIDTH, 0), ImGuiCond.None);
+                ImGui.SetNextWindowSize(new System.Numerics.Vector2(TILESET_WIDTH, mainGame.GraphicsDevice.Viewport.Height));
                 ImGui.Begin("Tileset",
                     ref windowTileset,
                     ImGuiWindowFlags.NoSavedSettings |
