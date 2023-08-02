@@ -47,33 +47,33 @@ namespace Zenith.Components {
         }
 
         public bool MouseClicked(MouseButton button) {
-            return !mainGame.guiInput.WantCaptureMouse &&
+            return mainGame.IsActive && !mainGame.guiInput.WantCaptureMouse &&
                 GetStateByMouseButton(previousMS, button) == ButtonState.Released &&
                 GetStateByMouseButton(currentMS, button) == ButtonState.Pressed;
         }
 
         public bool MouseDown(MouseButton button) {
-            return !mainGame.guiInput.WantCaptureMouse &&
+            return mainGame.IsActive && !mainGame.guiInput.WantCaptureMouse &&
                 GetStateByMouseButton(previousMS, button) == ButtonState.Pressed &&
                 GetStateByMouseButton(currentMS, button) == ButtonState.Pressed;
         }
 
         public bool MouseReleased(MouseButton button) {
-            return !mainGame.guiInput.WantCaptureMouse &&
+            return mainGame.IsActive && !mainGame.guiInput.WantCaptureMouse &&
                 GetStateByMouseButton(previousMS, button) == ButtonState.Pressed &&
                 GetStateByMouseButton(currentMS, button) == ButtonState.Released;
         }
 
         public bool KeyPressed(Keys key) {
-            return !mainGame.guiInput.WantTextInput && previousKS.IsKeyUp(key) && currentKS.IsKeyDown(key);
+            return mainGame.IsActive && !mainGame.guiInput.WantTextInput && previousKS.IsKeyUp(key) && currentKS.IsKeyDown(key);
         }
 
         public bool KeyDown(Keys key) {
-            return !mainGame.guiInput.WantTextInput && previousKS.IsKeyDown(key) && currentKS.IsKeyDown(key);
+            return mainGame.IsActive && !mainGame.guiInput.WantTextInput && previousKS.IsKeyDown(key) && currentKS.IsKeyDown(key);
         }
 
         public bool KeyReleased(Keys key) {
-            return !mainGame.guiInput.WantTextInput && previousKS.IsKeyDown(key) && currentKS.IsKeyUp(key);
+            return mainGame.IsActive && !mainGame.guiInput.WantTextInput && previousKS.IsKeyDown(key) && currentKS.IsKeyUp(key);
         }
     }
     public enum MouseButton { Left, Middle, Right }
