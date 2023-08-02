@@ -3,37 +3,54 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.IO;
+using System.Text;
 
 namespace Zenith.Components {
     public class TileMap {
-        public static readonly int CHUNK_SIZE = 64;
-        public static readonly int CULL_OFFSET = 2;
+        public const int CHUNK_SIZE = 64;
+        public const int CULL_OFFSET = 2;
 
         public readonly int[,] mapData = new int[CHUNK_SIZE, CHUNK_SIZE];
+        public readonly string mapFile;
         public readonly Texture2D tileset;
         public readonly int maxTilesetX;
+        public readonly int maxTilesetY;
         public readonly int tileWidth;
         public readonly int tileHeight;
 
         public TileMap(Texture2D tileset, string mapFile, int tileWidth, int tileHeight) {
+            this.mapFile = mapFile;
             this.tileset = tileset;
             maxTilesetX = tileset.Width / tileWidth;
+            maxTilesetY = tileset.Height / tileHeight;
             this.tileWidth = tileWidth;
             this.tileHeight = tileHeight;
-            LoadMapData(mapFile);
+            LoadMapData();
         }
 
-        private void LoadMapData(string mapFile) {
-            using (StreamReader reader = new(mapFile)) {
-                int y = 0;
-                while (!reader.EndOfStream) {
-                    string[] line = reader.ReadLine().Split(' ', StringSplitOptions.RemoveEmptyEntries);
-                    for (int x = 0; x < line.Length; x++) {
-                        mapData[x, y] = int.Parse(line[x]);
-                    }
-                    y++;
-                }
+        private void LoadMapData() {
+            using StreamReader reader = new(mapFile);
+            string[] data = reader.ReadToEnd().Split(new char[] { ' ', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            for (int d = 0; d < data.Length; d++) {
+                int x = d % CHUNK_SIZE;
+                int y = d / CHUNK_SIZE;
+                mapData[x, y] = int.Parse(data[d]);
             }
+        }
+
+        public string SaveMapData() {
+            try {
+                StringBuilder data = new();
+                for (int y = 0; y < CHUNK_SIZE; y++) {
+                    for (int x = 0; x < CHUNK_SIZE; x++) {
+                        data.Append(mapData[x, y]);
+                        data.Append(' ');
+                    }
+                }
+                using StreamWriter writer = new(mapFile);
+                writer.Write(data.ToString().Trim());
+                return "File saved";
+            } catch (IOException ex) { return ex.Message; }
         }
 
         public void Draw(SpriteBatch spriteBatch, Vector2 cameraPosition, Viewport viewport) {
@@ -60,7 +77,7 @@ namespace Zenith.Components {
             }
         }
 
-        public void DrawEditor(SpriteBatch spriteBatch, Vector2 cameraPosition, Viewport viewport, Texture2D selector, ImGuiIOPtr guiInput, InputManager gameInput) {
+        public void DrawEditor(SpriteBatch spriteBatch, Vector2 cameraPosition, Viewport viewport, Texture2D selector, ImGuiIOPtr guiInput, InputManager gameInput, int selectedTile) {
             // Calculate the range of tiles visible on the screen based on the camera position and the viewport.
             int startX = MathHelper.Clamp((int)(cameraPosition.X / tileWidth) - CULL_OFFSET, 0, CHUNK_SIZE);
             int startY = MathHelper.Clamp((int)(cameraPosition.Y / tileHeight) - CULL_OFFSET, 0, CHUNK_SIZE);
@@ -79,7 +96,7 @@ namespace Zenith.Components {
                             Color.White);
 
                         if (gameInput.MouseDown(MouseButton.Left)) {
-                            mapData[x, y] = 182;
+                            mapData[x, y] = selectedTile;
                         }
                     }
                 }
