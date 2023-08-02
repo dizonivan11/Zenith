@@ -9,6 +9,7 @@ namespace Zenith.Scenes {
     public class EditorScene : Scene {
         const int TOOLBOX_WIDTH = 90;
         const int TILESET_WIDTH = 408;
+        const int INFO_PADDING = 10;
         const int ACTION_BUFFER = 50; // Number of undo and redo action we can store
 
         TileMap tileMap;
@@ -17,9 +18,9 @@ namespace Zenith.Scenes {
         Texture2D selector;
         Vector2 cameraPosition;
         Vector2 cameraPositionDestination;
+        readonly float panSpeed;
 
         float mainMenuHeight;
-        readonly float panSpeed;
 
         public EditorScene(MainGame mainGame) : base(mainGame) {
             panSpeed = 100.0f;
@@ -61,6 +62,8 @@ namespace Zenith.Scenes {
             // Snap the camera if its almost at the destination to prevent pixel jittering causing blur
             if (Vector2.Distance(cameraPosition, cameraPositionDestination) <= 1f) cameraPositionDestination = cameraPosition;
 
+            tileMap.UpdateEditor(cameraPosition, mainGame.GraphicsDevice.Viewport, mainGame.guiInput, mainGame.gameInput);
+
             if (mainGame.gameInput.KeyPressed(Keys.F1))
                 mainGame.ChangeScene(new GameScene(mainGame));
 
@@ -69,9 +72,9 @@ namespace Zenith.Scenes {
         }
 
         public override void Draw() {
+            Editor.TilesRendered = 0;
             tileMap.Draw(mainGame.spriteBatch, cameraPosition, mainGame.GraphicsDevice.Viewport);
-            tileMap.DrawEditor(mainGame.spriteBatch, cameraPosition, mainGame.GraphicsDevice.Viewport, selector, mainGame.guiInput, mainGame.gameInput, selectedTile);
-            mainGame.DrawFPSCounter(TOOLBOX_WIDTH + 10, mainMenuHeight + 10);
+            tileMap.DrawEditor(mainGame.spriteBatch, cameraPosition, mainGame.GraphicsDevice.Viewport, mainGame.guiInput, mainGame.gameInput, selector);
         }
 
         /// <summary>
@@ -84,6 +87,7 @@ namespace Zenith.Scenes {
         bool windowDemo = false;
         bool windowTools = true;
         bool windowTileset = true;
+        bool windowInfo = true;
         public override void DrawUI(GameTime gameTime) {
             ImGui.BeginMainMenuBar();
             mainMenuHeight = ImGui.GetWindowSize().Y;
@@ -108,6 +112,9 @@ namespace Zenith.Scenes {
                 }
                 if (ImGui.MenuItem("Tileset", null, windowTileset)) {
                     windowTileset = !windowTileset;
+                }
+                if (ImGui.MenuItem("Info", null, windowInfo)) {
+                    windowInfo = !windowInfo;
                 }
                 ImGui.EndMenu();
             }
@@ -146,6 +153,7 @@ namespace Zenith.Scenes {
                 ImGui.Button("Fill", new NVector2(-1, 20));
                 ImGui.End();
             }
+
             if (windowTileset) {
                 ImGui.SetNextWindowPos(new NVector2(mainGame.GraphicsDevice.Viewport.Width - TILESET_WIDTH, mainMenuHeight), ImGuiCond.None);
                 ImGui.SetNextWindowSize(new NVector2(TILESET_WIDTH, mainGame.GraphicsDevice.Viewport.Height - mainMenuHeight));
@@ -167,6 +175,21 @@ namespace Zenith.Scenes {
                         if ((t + 1) % tileMap.maxTilesetX != 0) ImGui.SameLine();
                     }
                 }
+                ImGui.End();
+            }
+
+            if (windowInfo) {
+                ImGui.SetNextWindowPos(new NVector2(TOOLBOX_WIDTH + INFO_PADDING, mainMenuHeight + INFO_PADDING), ImGuiCond.None);
+                ImGui.Begin("Info",
+                    ref windowInfo,
+                    ImGuiWindowFlags.NoSavedSettings |
+                    ImGuiWindowFlags.NoMove |
+                    ImGuiWindowFlags.NoResize |
+                    ImGuiWindowFlags.NoTitleBar |
+                    ImGuiWindowFlags.NoBackground);
+                ImGui.Text(string.Format("FPS: {0}", (int)mainGame.fps.AverageFramesPerSecond));
+                ImGui.Text(string.Format("Tiles Rendered: {0}", Editor.TilesRendered));
+                ImGui.Text(string.Format("Mouse Position: X:{0} Y:{1}", mainGame.gameInput.MousePosition.X, mainGame.gameInput.MousePosition.Y));
                 ImGui.End();
             }
         }
