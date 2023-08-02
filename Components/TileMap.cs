@@ -55,10 +55,13 @@ namespace Zenith.Components {
 
         public void Draw(SpriteBatch spriteBatch, Vector2 cameraPosition, Viewport viewport) {
             // Calculate the range of tiles visible on the screen based on the camera position and the viewport.
-            int startX = MathHelper.Clamp((int)(cameraPosition.X / tileWidth) - CULL_OFFSET, 0, CHUNK_SIZE);
-            int startY = MathHelper.Clamp((int)(cameraPosition.Y / tileHeight) - CULL_OFFSET, 0, CHUNK_SIZE);
+            int startX = (int)(cameraPosition.X / tileWidth) - CULL_OFFSET;
+            int startY = (int)(cameraPosition.Y / tileHeight) - CULL_OFFSET;
             int endX = MathHelper.Clamp(startX + viewport.Width / tileWidth + 1 + (CULL_OFFSET * 2), 0, CHUNK_SIZE);
-            int endY = MathHelper.Clamp(startY + viewport.Height / tileHeight + 1 + (CULL_OFFSET  * 2), 0, CHUNK_SIZE);
+            int endY = MathHelper.Clamp(startY + viewport.Height / tileHeight + 1 + (CULL_OFFSET * 2), 0, CHUNK_SIZE);
+            startX = MathHelper.Clamp(startX, 0, CHUNK_SIZE);
+            startY = MathHelper.Clamp(startY, 0, CHUNK_SIZE);
+            Editor.TilesRendered += (endX - startX) * (endY - startY);
 
             for (int y = startY; y < endY; y++) {
                 for (int x = startX; x < endX; x++) {
@@ -77,12 +80,38 @@ namespace Zenith.Components {
             }
         }
 
-        public void DrawEditor(SpriteBatch spriteBatch, Vector2 cameraPosition, Viewport viewport, Texture2D selector, ImGuiIOPtr guiInput, InputManager gameInput, int selectedTile) {
+        public void UpdateEditor(Vector2 cameraPosition, Viewport viewport, ImGuiIOPtr guiInput, InputManager gameInput) {
             // Calculate the range of tiles visible on the screen based on the camera position and the viewport.
-            int startX = MathHelper.Clamp((int)(cameraPosition.X / tileWidth) - CULL_OFFSET, 0, CHUNK_SIZE);
-            int startY = MathHelper.Clamp((int)(cameraPosition.Y / tileHeight) - CULL_OFFSET, 0, CHUNK_SIZE);
+            int startX = (int)(cameraPosition.X / tileWidth) - CULL_OFFSET;
+            int startY = (int)(cameraPosition.Y / tileHeight) - CULL_OFFSET;
             int endX = MathHelper.Clamp(startX + viewport.Width / tileWidth + 1 + (CULL_OFFSET * 2), 0, CHUNK_SIZE);
             int endY = MathHelper.Clamp(startY + viewport.Height / tileHeight + 1 + (CULL_OFFSET * 2), 0, CHUNK_SIZE);
+            startX = MathHelper.Clamp(startX, 0, CHUNK_SIZE);
+            startY = MathHelper.Clamp(startY, 0, CHUNK_SIZE);
+
+            for (int y = startY; y < endY; y++) {
+                for (int x = startX; x < endX; x++) {
+                    float destX = (x * tileWidth) - cameraPosition.X;
+                    float destY = (y * tileHeight) - cameraPosition.Y;
+
+                    if (!guiInput.WantCaptureMouse && new Rectangle((int)destX, (int)destY, tileWidth, tileHeight).Contains(gameInput.MousePosition)) {
+                        if (gameInput.MouseDown(MouseButton.Left)) {
+                            mapData[x, y] = Editor.SelectedTile;
+                        }
+                    }
+                }
+            }
+        }
+
+        public void DrawEditor(SpriteBatch spriteBatch, Vector2 cameraPosition, Viewport viewport,
+            ImGuiIOPtr guiInput, InputManager gameInput, Texture2D selector) {
+            // Calculate the range of tiles visible on the screen based on the camera position and the viewport.
+            int startX = (int)(cameraPosition.X / tileWidth) - CULL_OFFSET;
+            int startY = (int)(cameraPosition.Y / tileHeight) - CULL_OFFSET;
+            int endX = MathHelper.Clamp(startX + viewport.Width / tileWidth + 1 + (CULL_OFFSET * 2), 0, CHUNK_SIZE);
+            int endY = MathHelper.Clamp(startY + viewport.Height / tileHeight + 1 + (CULL_OFFSET * 2), 0, CHUNK_SIZE);
+            startX = MathHelper.Clamp(startX, 0, CHUNK_SIZE);
+            startY = MathHelper.Clamp(startY, 0, CHUNK_SIZE);
 
             for (int y = startY; y < endY; y++) {
                 for (int x = startX; x < endX; x++) {
@@ -94,10 +123,6 @@ namespace Zenith.Components {
                             selector,
                             new Vector2(destX, destY),
                             Color.White);
-
-                        if (gameInput.MouseDown(MouseButton.Left)) {
-                            mapData[x, y] = selectedTile;
-                        }
                     }
                 }
             }
